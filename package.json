@@ -1,0 +1,32 @@
+{
+  "name": "playwright-enterprise",
+  "version": "1.0.0",
+  "description": "Enterprise-grade Playwright automation framework",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:smoke": "npx playwright test tests/e2e/smoke",
+    "test:e2e": "npx playwright test tests/e2e",
+    "test:auth": "npx playwright test tests/e2e/smoke",
+    "test:catalog": "npx playwright test tests/e2e/catalog",
+    "test:product": "npx playwright test tests/e2e/product",
+    "test:cart": "npx playwright test tests/e2e/cart",
+    "test:checkout": "npx playwright test tests/e2e/checkout",
+    "test:navigation": "npx playwright test tests/e2e/navigation",
+    "test:ci": "CI=true npx playwright test",
+    "test:headed": "HEADED=true npx playwright test",
+    "report": "npx playwright show-report reports/html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

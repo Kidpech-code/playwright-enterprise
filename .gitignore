@@ -1,0 +1,11 @@
+node_modules/
+dist/
+
+# Playwright artifacts
+reports/
+/playwright/.cache/
+/playwright/.auth/
+
+# Environment files with credentials — never commit
+env/.env.*
+!env/.env.example
