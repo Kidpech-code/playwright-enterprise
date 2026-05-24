@@ -122,7 +122,48 @@ playwright-enterprise/
 
 ---
 
-## Getting Started
+## Getting Started (Beginner Guide - Thai)
+
+ส่วนนี้เขียนสำหรับคนที่ "ไม่เคยเขียนเทสอัตโนมัติ" มาก่อนเลย
+
+### 1) Playwright คืออะไร?
+
+- Playwright คือเครื่องมือสำหรับสั่ง Browser อัตโนมัติ เหมือนมีคนคลิก/พิมพ์ให้
+- เราใช้มันตรวจสอบว่าเว็บทำงานถูกต้อง เช่น ล็อกอินได้, เพิ่มสินค้าเข้าตะกร้าได้, จ่ายเงินได้
+- ถ้าอนาคตมีคนแก้โค้ดแล้วระบบพัง เทสจะช่วยเตือนเร็วมาก
+
+### 2) โครงของเทส 1 เคส มีอะไรบ้าง?
+
+ตัวอย่างง่ายที่สุด:
+
+```ts
+import { test, expect } from "@playwright/test";
+
+test("user can open homepage", async ({ page }) => {
+  await page.goto("https://example.com");
+  await expect(page).toHaveTitle(/Example/);
+});
+```
+
+ความหมายแต่ละส่วน:
+
+- `test(...)` = 1 กรณีทดสอบ
+- `page` = แท็บเบราว์เซอร์ที่ใช้คลิก/พิมพ์
+- `await` = รอให้คำสั่งทำเสร็จก่อนค่อยไปบรรทัดถัดไป
+- `expect(...)` = เงื่อนไขที่ต้องเป็นจริง (Assertion)
+
+### 3) โปรเจกต์นี้ต่างจากเทส Playwright ธรรมดายังไง?
+
+โปรเจกต์นี้ใช้แนวทางที่เป็นระบบสำหรับงานจริง:
+
+- **Page Object Model (POM)**: แยกคำสั่งของแต่ละหน้าไว้ใน `src/pages/`
+- **Fixtures**: เตรียม object ของแต่ละหน้าให้พร้อมใช้จาก `src/fixtures/index.ts`
+- **Test Data**: ข้อมูลทดสอบอยู่ที่ `test-data/*.json`
+- **Environment Variables**: ค่าอย่าง password อยู่ในไฟล์ `env/.env.*`
+
+ข้อดีคือเทสอ่านง่าย, แก้ไขง่าย, และลดการเขียนซ้ำ
+
+### 4) เริ่มใช้งานครั้งแรก (ทำตามทีละข้อ)
 
 ### Prerequisites
 
@@ -137,20 +178,129 @@ npm install
 npx playwright install chromium
 ```
 
-### Environment Setup
+### 5) ตั้งค่า Environment
 
-Copy `.env.example` and fill in credentials:
+คัดลอกไฟล์ตัวอย่างก่อน:
 
 ```bash
 cp env/.env.example env/.env.staging
 ```
 
-`.env.staging` format:
+แล้วเปิด `env/.env.staging` และใส่ค่าให้ครบ:
 
-```
+```dotenv
 BASE_URL=https://www.saucedemo.com
 USER_STANDARD_PASSWORD=secret_sauce
 ```
+
+คำอธิบาย:
+
+- `BASE_URL` คือ URL หลักที่เทสจะเข้า
+- `USER_STANDARD_PASSWORD` คือรหัสผ่านผู้ใช้ทดสอบ
+- ถ้าอยากสลับ env สามารถใช้ตัวแปร `TEST_ENV` เช่น `TEST_ENV=staging`
+
+ตัวอย่างรันด้วย env ที่ต้องการ:
+
+```bash
+# macOS/Linux
+TEST_ENV=staging npm test
+
+# Windows (PowerShell)
+$env:TEST_ENV='staging'; npm test
+```
+
+### 6) รันเทสครั้งแรก
+
+เริ่มจากรันทั้งหมด:
+
+```bash
+npm test
+```
+
+ถ้าอยากเห็นเบราว์เซอร์ตอนรัน:
+
+```bash
+npm run test:headed
+```
+
+ถ้าอยากเริ่มจากชุดเล็กก่อน (แนะนำมือใหม่):
+
+```bash
+npm run test:auth
+```
+
+### 7) ดูผลทดสอบ (Report)
+
+หลังรันเสร็จ เปิดรายงาน:
+
+```bash
+npm run report
+```
+
+สิ่งที่ควรดูในรายงาน:
+
+- Test ไหนผ่าน/ไม่ผ่าน
+- Error message ตอน fail
+- Trace/Video ของเคสที่ fail เพื่อไล่ step ย้อนหลัง
+
+### 8) เขียนเทสใหม่อย่างไร (ในโปรเจกต์นี้)
+
+โครงแนะนำสำหรับมือใหม่:
+
+1. สร้างไฟล์ใหม่ใน `tests/e2e/...` เช่น `tests/e2e/smoke/first-login.spec.ts`
+2. import `test, expect` จาก `src/fixtures`
+3. เรียกใช้ page object เช่น `loginPage`
+4. assert ผลลัพธ์ด้วย `expect`
+
+ตัวอย่าง:
+
+```ts
+import { test, expect } from "../../../src/fixtures";
+import users from "../../../test-data/users.json";
+
+test("BEGINNER-001 | login success should show Products title", async ({
+  loginPage,
+  page,
+}) => {
+  await loginPage.open();
+  await loginPage.loginAs(
+    users.standardUser.username,
+    process.env.USER_STANDARD_PASSWORD ?? "",
+  );
+
+  await expect(page.locator(".title")).toHaveText("Products");
+});
+```
+
+รันเฉพาะไฟล์นี้:
+
+```bash
+npx playwright test tests/e2e/smoke/first-login.spec.ts --project=chromium --headed
+```
+
+### 9) คำศัพท์สำคัญที่ควรรู้
+
+- **Spec file**: ไฟล์เทส เช่น `*.spec.ts`
+- **Suite**: กลุ่มเทสที่อยู่ใน `test.describe(...)`
+- **Locator**: วิธีเลือก element บนหน้าเว็บ
+- **Assertion**: การยืนยันผลด้วย `expect`
+- **Fixture**: ของที่ Playwright สร้างให้พร้อมใช้ก่อนเทสเริ่ม
+- **POM**: คลาสที่รวมการกระทำของแต่ละหน้า
+
+### 10) Troubleshooting เบื้องต้น
+
+- Error เรื่อง env/password: ตรวจไฟล์ `env/.env.staging`
+- Error หา element ไม่เจอ: ลองรัน `npm run test:headed` เพื่อดูหน้าจริง
+- เทสผ่านบ้าง fail บ้าง: เปิด trace จาก report เพื่อตรวจ timing และ locator
+- อยากดูละเอียดตอน debug: รันเฉพาะไฟล์เดียวก่อน แล้วค่อยขยายไปทั้ง suite
+
+### 11) ลำดับการเรียนที่แนะนำสำหรับมือใหม่
+
+1. รัน `npm run test:auth` ให้ผ่านก่อน
+2. อ่านไฟล์ `tests/e2e/smoke/login.spec.ts` เพื่อเข้าใจ pattern
+3. ลองเพิ่ม 1 เคสใหม่ในไฟล์เดิม
+4. ค่อยขยับไป suite อื่น (`catalog`, `cart`, `checkout`)
+5. ปิดท้ายด้วยรัน `npm test` ทั้งระบบ
 
 ---
 
