@@ -345,6 +345,16 @@ The Manual Testing Companion adds a non-developer workflow on top of this Playwr
 
 The local Agent is the only process that writes files. The Chrome Extension is the controller: it connects to the Agent over WebSocket, shows the recording state, and sends user actions such as start, screenshot, bug marker, pause, and stop.
 
+### Evidence Documentation Matrix
+
+This table is the quick source of truth for the three manual-testing evidence features reviewers usually ask about first:
+
+| Feature | Current Status | Integration Plan |
+| --- | --- | --- |
+| Screenshots | Implemented and documented here. Previously not consolidated in one table. | Auto-captured on manual events such as Screenshot, Checkpoint, Note, Bug, session start, and session stop. Saved to `test-artifacts/session_<timestamp>/screenshots/`, with the latest image copied to `test-artifacts/session_<timestamp>/screenshot.png`. |
+| Video Recording | Implemented and documented here. Previously not consolidated in one table. | Started by the Playwright-managed browser session and controlled through the WebSocket Agent lifecycle. Finalized on Stop and saved to `test-artifacts/session_<timestamp>/video/video.webm`, with the raw Playwright page video retained in the same `video/` folder. |
+| User Guide | Implemented and documented here. Previously not consolidated in one table. | README includes a step-by-step visual walkthrough using 3-second intervals, controller states, artifact layout, report review, and troubleshooting guidance. |
+
 ### Start a Manual Session
 
 ```bash
