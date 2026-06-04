@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing Companion</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Testing Companion</h1>
+      <p id="statusText">Connecting to local agent...</p>
+      <div id="stateBadge" class="state-badge state-idle">Idle</div>
+    </header>
+
+    <section class="phase-guide" aria-label="Tutorial mode phases">
+      <div id="phaseInitialization" class="phase-step active">
+        <span>1</span>
+        <strong>Initialize</strong>
+      </div>
+      <div id="phaseRecording" class="phase-step">
+        <span>2</span>
+        <strong>Record</strong>
+      </div>
+      <div id="phaseCapture" class="phase-step">
+        <span>3</span>
+        <strong>Capture</strong>
+      </div>
+      <div id="phaseConclusion" class="phase-step">
+        <span>4</span>
+        <strong>Stop</strong>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <label>Workspace</label>
+      <p id="workspacePath">Waiting for session directory...</p>
+    </section>
+
+    <section class="connection">
+      <label for="agentUrl">Agent</label>
+      <div class="agent-row">
+        <input id="agentUrl" type="text" value="ws://127.0.0.1:3737" autocomplete="off">
+        <button id="connectButton" type="button">Connect</button>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Session controls">
+      <button id="startButton" type="button">Start Manual Test</button>
+      <button id="pauseButton" type="button">Pause</button>
+      <button id="stepForwardButton" type="button">Step Forward</button>
+      <button id="screenshotButton" type="button">Screenshot</button>
+      <button id="checkpointButton" type="button">Checkpoint</button>
+      <button id="bugButton" type="button">Mark Bug</button>
+      <button id="cursorButton" type="button">Hide Cursor</button>
+    </section>
+
+    <section class="note">
+      <label for="noteText">Note</label>
+      <textarea id="noteText" rows="4" placeholder="What did you observe?"></textarea>
+      <div class="note-row">
+        <select id="severitySelect" aria-label="Bug severity">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+          <option value="critical">Critical</option>
+        </select>
+        <button id="noteButton" type="button">Add Note</button>
+      </div>
+    </section>
+
+    <section class="finish">
+      <button id="stopButton" type="button">Stop & Generate Report</button>
+    </section>
+
+    <section id="reportPanel" class="report-panel" hidden>
+      <h2>Report Ready</h2>
+      <a id="reportLink" href="#" target="_blank" rel="noreferrer">Open report</a>
+      <p id="zipPath"></p>
+    </section>
+
+    <section class="activity">
+      <h2>Activity</h2>
+      <ol id="activityList"></ol>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script src="popup.js"></script>
+</body>
+</html>

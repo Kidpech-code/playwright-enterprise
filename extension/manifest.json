@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Testing Companion",
+  "description": "Manual testing controller for Playwright Enterprise reports.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "Testing Companion",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' ws://127.0.0.1:* ws://localhost:*;"
+  }
+}

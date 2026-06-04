@@ -5,7 +5,12 @@ import fs from 'fs';
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 export async function captureStepScreenshot(page: Page, label: string): Promise<void> {
-  const testInfo = test.info();
+  let testInfo;
+  try {
+    testInfo = test.info();
+  } catch {
+    return;
+  }
 
   const stepNumber = String(testInfo.attachments.length + 1).padStart(3, '0');
   const safeLabel = label.replace(/[^a-z0-9-]/gi, '-').toLowerCase();

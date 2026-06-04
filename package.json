@@ -14,6 +14,10 @@
     "test:navigation": "npx playwright test tests/e2e/navigation",
     "test:ci": "CI=true npx playwright test",
     "test:headed": "HEADED=true npx playwright test",
+    "manual:start": "ts-node src/manual/cli.ts",
+    "manual:validate": "npx playwright test tests/manual",
+    "tutorial:start": "ts-node src/tutorial/cli.ts",
+    "tutorial:validate": "npx playwright test tests/tutorial",
     "report": "npx playwright show-report reports/html"
   },
   "keywords": [],

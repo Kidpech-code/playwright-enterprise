@@ -339,6 +339,225 @@ npm run report
 
 ---
 
+## Manual Testing Companion
+
+The Manual Testing Companion adds a non-developer workflow on top of this Playwright framework. It launches a Playwright-managed Chrome/Chromium window with the local Chrome Extension loaded, records video, captures screenshots and DOM snapshots, collects console/network evidence, and generates a local professional report bundle.
+
+The local Agent is the only process that writes files. The Chrome Extension is the controller: it connects to the Agent over WebSocket, shows the recording state, and sends user actions such as start, screenshot, bug marker, pause, and stop.
+
+### Start a Manual Session
+
+```bash
+npm run manual:start -- --url https://www.saucedemo.com
+```
+
+Optional flags:
+
+```bash
+# Custom agent port
+npm run manual:start -- --port 3737
+
+# Use a proxy for environments only reachable through a proxy
+npm run manual:start -- --proxy http://127.0.0.1:8080
+
+# Use a named installed browser channel when needed
+npm run manual:start -- --browser-channel chrome
+```
+
+Environment variables can also be set in `env/.env.staging`:
+
+```dotenv
+MANUAL_TARGET_URL=https://www.saucedemo.com
+MANUAL_AGENT_PORT=3737
+MANUAL_REPORT_ROOT=test-artifacts
+MANUAL_PROFILE_DIR=test-artifacts/manual-profile
+MANUAL_EXTENSION_DIR=extension
+MANUAL_PROXY=
+MANUAL_BROWSER_CHANNEL=
+```
+
+### Three-Second Controller Flow
+
+The controller uses a deliberate tutorial cadence for manual actions. Start, capture, and stop commands show the next phase for about 3 seconds before sending the command to the Agent. Pause and Resume stay immediate so a tester can interrupt safely.
+
+1. **Initialization**
+
+   The tester clicks **Start Manual Test** in the Testing Companion popup. The controller highlights **Initialize**, confirms the WebSocket connection to `ws://127.0.0.1:3737`, and shows the workspace path.
+
+   The Agent has already created the session workspace when the managed browser launched:
+
+   ```text
+   ./test-artifacts/session_<timestamp>/
+   ```
+
+2. **Recording Phase**
+
+   Playwright video recording starts when the managed browser context opens. The controller highlights **Record** and shows the `Recording` state badge. Keep controls in the extension popup for clean video. In-page tutorial indicators are marked with `testing-companion-no-capture` and are hidden before screenshots and DOM snapshots.
+
+3. **Auto-Capture Event**
+
+   The tester clicks **Screenshot**, **Checkpoint**, **Add Note**, or **Mark Bug**. The controller highlights **Capture** for 3 seconds, then the Agent captures the current page screenshot and DOM snapshot together. A `Captured screenshot and DOM snapshot` toast remains visible in the controller for 3 seconds.
+
+4. **Conclusion**
+
+   The tester clicks **Stop & Generate Report**. The controller highlights **Stop** for 3 seconds, then the Agent stops tracing/video, closes the test page, collects artifacts, writes the report files, and builds the ZIP bundle.
+
+Raw Playwright video records the browser viewport exactly. For a clean recording, keep persistent controls in the extension popup. Temporary tutorial hints are safe for screenshots because the Agent hides `.testing-companion-no-capture` and `data-testing-companion-transient` elements before evidence capture.
+
+### Tester Workflow
+
+1. Run `npm run manual:start -- --url <target-url>`.
+2. Open the **Testing Companion** extension popup in the launched browser.
+3. Confirm the popup is connected to the local Agent.
+4. Click **Start Manual Test** to add the visible start marker.
+5. Perform the manual test steps in the browser.
+6. Use **Screenshot**, **Checkpoint**, **Add Note**, and **Mark Bug** to capture evidence.
+7. Use **Hide/Show Cursor** when you want the pointer shown or hidden during the run.
+8. Use **Pause / Resume** for non-destructive debugging. The browser, trace, video, and session context stay alive.
+9. Click **Stop & Generate Report**.
+10. Open the local `file://` report link printed by the CLI or shown in the extension popup.
+
+### Artifact Layout
+
+Manual and guided tutorial reports are written under `test-artifacts` by default:
+
+```text
+test-artifacts/session_<timestamp>/
+|-- summary.html
+|-- index.html
+|-- manual-session.json
+|-- log.json
+|-- logs.json
+|-- screenshot.png
+|-- trace.zip
+|-- video/
+|   |-- video.webm
+|   |-- page@<id>.webm
+|-- screenshots/
+|   |-- step-0001-*.png
+|   |-- step-0002-*.png
+|-- snapshots/
+|   |-- step-0001-*.html
+|   |-- step-0002-*.html
+|-- session_<timestamp>.zip
+```
+
+`summary.html` is the primary report. `index.html` is kept as a compatibility copy so local links remain easy to open.
+
+### How Evidence Appears In The Report
+
+- **Summary metrics** show status, duration, step count, bugs, console logs, and network issues.
+- **Artifacts** link to `manual-session.json`, `log.json`, `trace.zip`, `screenshot.png`, `video/video.webm`, and the ZIP bundle.
+- **Video Recordings** render inline with native `<video controls>`, so reviewers can watch the captured viewport directly from `summary.html`.
+- **Timeline** shows each manual or tutorial step with the screenshot thumbnail, URL, page title, viewport, notes, severity/category, and direct links to the DOM snapshot and screenshot.
+- **Logs** show console entries and network failures in a readable JSON panel.
+
+### Troubleshooting Manual Sessions
+
+- **Extension cannot connect to the Agent**
+
+  Start the Agent first with `npm run manual:start -- --url <target-url>`. Confirm the popup Agent field matches the CLI port, usually `ws://127.0.0.1:3737`.
+
+- **Permission denied while creating files**
+
+  The Agent writes to `MANUAL_REPORT_ROOT` or `TUTORIAL_REPORT_ROOT`. Use a writable folder such as `test-artifacts`, avoid protected system folders, and create the directory manually if needed:
+
+  ```bash
+  mkdir -p test-artifacts
+  ```
+
+- **No video appears**
+
+  Stop the session from the controller or press `Ctrl+C` in the CLI so Playwright can close the page and flush `.webm` files. Video files are finalized only when the browser page/context closes.
+
+- **Controller UI appears in evidence**
+
+  Keep primary controls in the extension popup. In-page tutorial cues are transient and hidden before screenshots/DOM snapshots, but raw video records whatever is visible inside the page viewport.
+
+### Validation
+
+```bash
+npm run manual:validate
+```
+
+This checks that the manual report generator writes the expected HTML, JSON, logs, and ZIP artifacts.
+
+---
+
+## Guided Tutorial Recorder
+
+The Guided Tutorial Recorder is a polished autoplay walkthrough for teaching the existing Sauce Demo flow. It reuses the Page Object Model classes in `src/pages`, moves at a deliberate 3-second pace, hides tutorial indicators before screenshots, and uses the Testing Companion extension as the recording control surface.
+
+### Start the Guided Tutorial
+
+```bash
+npm run tutorial:start -- --url https://www.saucedemo.com
+```
+
+Open the **Testing Companion** extension popup in the launched browser to control the session. The controller stays outside the captured page viewport, so its buttons do not appear in screenshots or videos.
+
+Available controls:
+
+- **Start Recording** adds a start marker.
+- **Pause / Resume** pauses tutorial progression without destroying the browser, trace, video, or session context.
+- **Step Forward** skips the current tutorial delay.
+- **Screenshot**, **Add Note**, **Checkpoint**, and **Mark Bug** add evidence to the report.
+- **Stop & Generate Report** finalizes the video, trace, screenshots, DOM snapshots, logs, HTML report, and ZIP bundle.
+
+The controller status badge shows the current recording state: idle, preparing, recording, paused, capturing, stopping, report ready, or error.
+
+### Tutorial Flow
+
+The default tutorial records this journey:
+
+1. Open the Sauce Demo login page.
+2. Log in with the standard user.
+3. Review and sort the product catalog.
+4. Open a product detail page.
+5. Add the product to the cart.
+6. Review the cart.
+7. Enter checkout information.
+8. Review the checkout overview.
+9. Finish checkout and capture the order confirmation page.
+
+### Timing And Debug Options
+
+The default training pace is 3 seconds before each action and 3 seconds around each capture:
+
+```bash
+npm run tutorial:start -- --step-delay 3000 --capture-delay 3000
+```
+
+Use shorter delays for smoke validation:
+
+```bash
+npm run tutorial:start -- --step-delay 1 --capture-delay 1
+```
+
+Environment variables can also be set in `env/.env.staging`:
+
+```dotenv
+TUTORIAL_TARGET_URL=https://www.saucedemo.com
+TUTORIAL_REPORT_ROOT=test-artifacts
+TUTORIAL_PROFILE_DIR=test-artifacts/tutorial-profile
+TUTORIAL_MODE=autoplay
+TUTORIAL_STEP_DELAY_MS=3000
+TUTORIAL_CAPTURE_DELAY_MS=3000
+TUTORIAL_PAUSE_ON_FAILURE=false
+```
+
+When `TUTORIAL_PAUSE_ON_FAILURE=true`, failures pause the tutorial for live code review before the report is finalized.
+
+### Validation
+
+```bash
+npm run tutorial:validate
+```
+
+This validates tutorial step sequencing and confirms transient overlays are hidden before evidence capture.
+
+---
+
 ## Key Concepts Demonstrated
 
 ### Page Object Model (POM)

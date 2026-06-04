@@ -55,6 +55,13 @@ export class CatalogPage extends BasePage {
     );
   }
 
+  async clickProductTitleLinkByIndex(index: number): Promise<void> {
+    await this.click(
+      this.productItems.nth(index).locator('a[data-test$="-title-link"]'),
+      `product-title-link-${index}`
+    );
+  }
+
   async clickProductImageByIndex(index: number): Promise<void> {
     await this.click(
       this.productItems.nth(index).locator('.inventory_item_img img'),
