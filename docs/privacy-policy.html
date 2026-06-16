@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing Companion — Privacy Policy</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #18212f;
+      background: #f6f8fb;
+    }
+    header {
+      background: #111827;
+      color: #f9fafb;
+      padding: 40px max(24px, calc((100vw - 760px) / 2));
+    }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p  { margin: 0; color: #9ca3af; font-size: 14px; }
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+    h2 {
+      margin: 36px 0 10px;
+      font-size: 18px;
+      color: #0f172a;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+    p { margin: 0 0 14px; }
+    ul { margin: 0 0 14px; padding-left: 22px; }
+    li { margin-bottom: 6px; }
+    code {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 13px;
+      background: #eef2f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    pre {
+      background: #101828;
+      color: #f9fafb;
+      border-radius: 8px;
+      padding: 14px 16px;
+      overflow: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0 0 14px;
+    }
+    a { color: #0f766e; }
+    .updated {
+      display: inline-block;
+      font-size: 13px;
+      color: #667085;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Testing Companion</h1>
+    <p>Privacy Policy <span class="updated">· Last updated: June 4, 2026</span></p>
+  </header>
+
+  <main>
+    <p>
+      Testing Companion is a Chrome Extension for controlling local
+      <a href="https://github.com/Kidpech-code/playwright-enterprise">Playwright Enterprise</a>
+      manual testing sessions. This policy explains what data the extension accesses,
+      how it is used, and where evidence artifacts are stored.
+    </p>
+
+    <h2>Summary</h2>
+    <p>
+      Testing Companion is designed for local manual testing workflows. The extension connects
+      to a local Playwright Agent running on the tester's machine and sends user-triggered
+      control commands: start, pause, screenshot, checkpoint, bug marker, cursor toggle, and stop.
+    </p>
+    <p>
+      Testing Companion does <strong>not</strong> sell data, does <strong>not</strong> use data
+      for advertising, and does <strong>not</strong> transmit testing artifacts to third-party services.
+    </p>
+
+    <h2>Data the Extension May Access</h2>
+    <p>
+      The local Playwright Agent (not the extension itself) may generate the following artifacts
+      when a tester actively triggers evidence capture:
+    </p>
+    <ul>
+      <li>Screenshots of the page under test</li>
+      <li>DOM snapshots of the page under test</li>
+      <li>Console logs and network failure summaries</li>
+      <li>Playwright trace files</li>
+      <li>Video recordings of the Playwright-managed browser viewport</li>
+      <li>Tester-entered notes, checkpoints, categories, and severity labels</li>
+      <li>Local report metadata: target URL, viewport size, timestamps, artifact paths</li>
+    </ul>
+    <p>The Chrome Extension itself stores only lightweight local preferences:</p>
+    <ul>
+      <li>The configured local WebSocket Agent URL (e.g. <code>ws://127.0.0.1:3737</code>)</li>
+      <li>Cursor visibility preference</li>
+    </ul>
+
+    <h2>How Data Is Used</h2>
+    <p>
+      Data is used only to support manual testing evidence capture and local report generation.
+      The extension sends commands to the local Playwright Agent over WebSocket. The Agent
+      performs screenshots, DOM snapshot capture, video recording, trace capture, and report generation.
+    </p>
+
+    <h2>Where Data Is Stored</h2>
+    <p>Generated testing artifacts are stored locally in the configured project workspace:</p>
+    <pre>test-artifacts/session_&lt;timestamp&gt;/
+  summary.html
+  manual-session.json
+  log.json
+  screenshot.png
+  trace.zip
+  video/video.webm
+  screenshots/
+  snapshots/
+  session_&lt;timestamp&gt;.zip</pre>
+    <p>
+      The extension does not upload these files. Testers or teams decide if and how to share
+      generated ZIP bundles or reports.
+    </p>
+
+    <h2>Data Sharing</h2>
+    <p>
+      Testing Companion does not share data with third parties. If a tester manually sends a
+      generated report, ZIP bundle, screenshot, DOM snapshot, trace, video, or log to another
+      person or system, that sharing is controlled by the tester or their organization.
+    </p>
+
+    <h2>Remote Code</h2>
+    <p>
+      Testing Companion does not execute remote code. All extension files are packaged with
+      the extension at install time.
+    </p>
+
+    <h2>Network Communication</h2>
+    <p>
+      Testing Companion communicates with the local Playwright Agent over WebSocket.
+      The default URL is <code>ws://127.0.0.1:3737</code>. The extension content security
+      policy allows WebSocket connections to localhost only:
+    </p>
+    <pre>ws://127.0.0.1:* ws://localhost:*</pre>
+
+    <h2>Permissions</h2>
+    <ul>
+      <li><strong>activeTab</strong> — coordinate cursor visibility with the active page during a manual testing session</li>
+      <li><strong>tabs</strong> — identify the active tab so cursor overlay updates reach the correct page</li>
+      <li><strong>storage</strong> — remember local preferences: WebSocket Agent URL and cursor visibility state</li>
+      <li><strong>&lt;all_urls&gt; host access</strong> — the content script must run on any URL the tester opens for manual testing (local, staging, QA, or production-like environments)</li>
+    </ul>
+
+    <h2>User Control</h2>
+    <p>
+      Users control when testing sessions start and stop. Users also control when screenshots,
+      checkpoints, notes, and bug markers are captured through the extension popup.
+      Generated artifacts can be deleted at any time by removing the local
+      <code>test-artifacts/</code> session folders.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      For questions about this extension, open an issue or contact the repository owner at:
+      <br>
+      <a href="https://github.com/Kidpech-code/playwright-enterprise">
+        https://github.com/Kidpech-code/playwright-enterprise
+      </a>
+    </p>
+  </main>
+</body>
+</html>

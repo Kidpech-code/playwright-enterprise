@@ -349,16 +349,16 @@ The local Agent is the only process that writes files. The Chrome Extension is t
 
 This table is the quick source of truth for the three manual-testing evidence features reviewers usually ask about first:
 
-| Feature | Current Status | Integration Plan |
-| --- | --- | --- |
-| Screenshots | Implemented and documented here. Previously not consolidated in one table. | Auto-captured on manual events such as Screenshot, Checkpoint, Note, Bug, session start, and session stop. Saved to `test-artifacts/session_<timestamp>/screenshots/`, with the latest image copied to `test-artifacts/session_<timestamp>/screenshot.png`. |
-| Video Recording | Implemented and documented here. Previously not consolidated in one table. | Started by the Playwright-managed browser session and controlled through the WebSocket Agent lifecycle. Finalized on Stop and saved to `test-artifacts/session_<timestamp>/video/video.webm`, with the raw Playwright page video retained in the same `video/` folder. |
-| User Guide | Implemented and documented here. Previously not consolidated in one table. | README includes a step-by-step visual walkthrough using 3-second intervals, controller states, artifact layout, report review, and troubleshooting guidance. |
+| Feature         | Current Status                                                             | Integration Plan                                                                                                                                                                                                                                                                                      |
+| --------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Screenshots     | Implemented and documented here. Previously not consolidated in one table. | Auto-captured on manual events such as Screenshot, Checkpoint, Note, Bug, session start, pause, resume, cursor toggle, and final session completion. Saved to `test-artifacts/session_<timestamp>/screenshots/`, with the latest image copied to `test-artifacts/session_<timestamp>/screenshot.png`. |
+| Video Recording | Implemented and documented here. Previously not consolidated in one table. | Started by the Playwright-managed browser session and controlled through the WebSocket Agent lifecycle. Finalized on Stop and saved to `test-artifacts/session_<timestamp>/video/video.webm`, with the raw Playwright page video retained in the same `video/` folder.                                |
+| User Guide      | Implemented and documented here. Previously not consolidated in one table. | README includes a step-by-step visual walkthrough using 3-second intervals, controller states, artifact layout, report review, and troubleshooting guidance.                                                                                                                                          |
 
 ### Start a Manual Session
 
 ```bash
-npm run manual:start -- --url https://www.saucedemo.com
+npm run manual:start -- --url https://twentcode.com
 ```
 
 Optional flags:
@@ -386,6 +386,36 @@ MANUAL_PROXY=
 MANUAL_BROWSER_CHANNEL=
 ```
 
+### Popup Controls You Should See
+
+When the browser launches, open the **Testing Companion** extension popup. The popup should show these buttons:
+
+| Button in popup                   | What it does                                                   | Delay behavior                             | Creates screenshot + DOM snapshot?                                         |
+| --------------------------------- | -------------------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------- |
+| **Start Manual Test**             | Starts the visible manual session marker in the report         | Waits 3 seconds before sending the command | Yes                                                                        |
+| **Pause** / **Resume**            | Pauses or resumes the live session without closing the browser | Immediate                                  | Yes                                                                        |
+| **Step Forward**                  | Skips the current tutorial delay in guided mode                | Immediate                                  | No                                                                         |
+| **Screenshot**                    | Captures the current page as evidence                          | Waits 3 seconds before sending the command | Yes                                                                        |
+| **Checkpoint**                    | Adds a checkpoint to the report timeline                       | Waits 3 seconds before sending the command | Yes                                                                        |
+| **Mark Bug**                      | Adds a bug marker with severity                                | Waits 3 seconds before sending the command | Yes                                                                        |
+| **Add Note**                      | Adds a note entry to the report timeline                       | Waits 3 seconds before sending the command | Yes                                                                        |
+| **Hide Cursor** / **Show Cursor** | Toggles the cursor overlay state                               | Immediate                                  | Yes                                                                        |
+| **Stop & Generate Report**        | Finalizes artifacts and builds the report bundle               | Waits 3 seconds before sending the command | No new manual capture step; it finalizes the session and flushes artifacts |
+
+If you do not see these buttons, you are not in the extension popup yet. Click the extension icon in the launched browser toolbar and open **Testing Companion**.
+
+### Recording And Capture Timing
+
+This is the exact timing model used by the controller:
+
+| Event                                                  | What starts immediately                                                     | What happens after the 3-second guide delay                                                 |
+| ------------------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Browser launched by `manual:start` or `tutorial:start` | Playwright opens the managed browser context and raw video recording begins | Nothing else is needed to start raw video recording                                         |
+| **Start Manual Test**                                  | Popup enters the Initialize phase                                           | The Agent records the `session-start` step and captures screenshot + DOM snapshot           |
+| **Screenshot / Checkpoint / Add Note / Mark Bug**      | Popup enters the Capture phase and shows a toast                            | The Agent captures screenshot + DOM snapshot and writes a timeline step                     |
+| **Pause / Resume**                                     | Session pauses or resumes immediately                                       | No extra delay; the Agent still records a pause/resume evidence step                        |
+| **Stop & Generate Report**                             | Popup enters the Stop phase                                                 | The Agent closes the session cleanly, flushes video, and writes HTML/JSON/log/ZIP artifacts |
+
 ### Three-Second Controller Flow
 
 The controller uses a deliberate tutorial cadence for manual actions. Start, capture, and stop commands show the next phase for about 3 seconds before sending the command to the Agent. Pause and Resume stay immediate so a tester can interrupt safely.
@@ -406,7 +436,7 @@ The controller uses a deliberate tutorial cadence for manual actions. Start, cap
 
 3. **Auto-Capture Event**
 
-   The tester clicks **Screenshot**, **Checkpoint**, **Add Note**, or **Mark Bug**. The controller highlights **Capture** for 3 seconds, then the Agent captures the current page screenshot and DOM snapshot together. A `Captured screenshot and DOM snapshot` toast remains visible in the controller for 3 seconds.
+The tester clicks **Screenshot**, **Checkpoint**, **Add Note**, or **Mark Bug**. The controller highlights **Capture** for 3 seconds, then the Agent captures the current page screenshot and DOM snapshot together. A `Captured screenshot and DOM snapshot` toast remains visible in the controller for 3 seconds. **Pause**, **Resume**, and **Hide/Show Cursor** are different: they act immediately and still create an evidence step.
 
 4. **Conclusion**
 
@@ -508,7 +538,7 @@ Open the **Testing Companion** extension popup in the launched browser to contro
 
 Available controls:
 
-- **Start Recording** adds a start marker.
+- **Start Manual Test** adds a start marker.
 - **Pause / Resume** pauses tutorial progression without destroying the browser, trace, video, or session context.
 - **Step Forward** skips the current tutorial delay.
 - **Screenshot**, **Add Note**, **Checkpoint**, and **Mark Bug** add evidence to the report.

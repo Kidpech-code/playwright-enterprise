@@ -14,13 +14,22 @@ Use this checklist before publishing or distributing the Chrome Extension.
 
 ## Manual Validation
 
-- [ ] Run the local Agent:
+- [x] Run the local Agent (guided tutorial path executed and completed):
 
   ```bash
-  npm run manual:start -- --url https://www.saucedemo.com
+  npm run tutorial:start -- --url https://www.saucedemo.com --step-delay 1 --capture-delay 1
   ```
 
-- [ ] Open the Testing Companion popup.
+- [x] Confirm `summary.html` opens.
+- [x] Confirm `video/video.webm`, `screenshots/`, `snapshots/`, `log.json`, and ZIP are generated.
+- [x] Run validation suites:
+
+  ```bash
+  npm run manual:validate
+  npm run tutorial:validate
+  ```
+
+- [ ] Open the Testing Companion popup in the launched browser.
 - [ ] Confirm connection to `ws://127.0.0.1:3737`.
 - [ ] Click **Start Manual Test**.
 - [ ] Capture a screenshot.
@@ -28,8 +37,12 @@ Use this checklist before publishing or distributing the Chrome Extension.
 - [ ] Mark a bug.
 - [ ] Toggle cursor visibility.
 - [ ] Click **Stop & Generate Report**.
-- [ ] Confirm `summary.html` opens.
-- [ ] Confirm `video/video.webm`, `screenshots/`, `snapshots/`, `log.json`, and ZIP are generated.
+
+### Last Verified Artifact Bundle
+
+- Session folder: `test-artifacts/session_2026-06-04T15-25-12-488Z/`
+- Report: `test-artifacts/session_2026-06-04T15-25-12-488Z/summary.html`
+- Zip: `test-artifacts/session_2026-06-04T15-25-12-488Z/session_2026-06-04T15-25-12-488Z.zip`
 
 ## Packaging
 
@@ -42,3 +55,4 @@ zip -r ../testing-companion-extension.zip . -x "*.DS_Store"
 
 Chrome Web Store uploads should include only the extension directory contents, not generated test artifacts.
 
+- [x] Packaged release zip: `release/testing-companion-0.1.0.zip`

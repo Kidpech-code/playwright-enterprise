@@ -18,6 +18,8 @@
     "manual:validate": "npx playwright test tests/manual",
     "tutorial:start": "ts-node src/tutorial/cli.ts",
     "tutorial:validate": "npx playwright test tests/tutorial",
+    "extension:package": "bash scripts/package-extension.sh",
+    "extension:prepublish-check": "node -e \"JSON.parse(require('fs').readFileSync('extension/manifest.json','utf8')); console.log('manifest-json: ok')\" && rg -n \"eval\\(|new Function|http://|https://|chrome\\.scripting|externally_connectable\" extension/*.js extension/manifest.json extension/popup.html || true",
     "report": "npx playwright show-report reports/html"
   },
   "keywords": [],
