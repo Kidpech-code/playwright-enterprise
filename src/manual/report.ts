@@ -186,7 +186,7 @@ function renderReportHtml(session: ManualSessionRecord): string {
       padding: 0;
       list-style: none;
     }
-	    .artifact-link {
+    .artifact-link {
       display: inline-flex;
       align-items: center;
       min-height: 34px;
@@ -197,24 +197,24 @@ function renderReportHtml(session: ManualSessionRecord): string {
       text-decoration: none;
       background: #f8fafc;
       font-weight: 600;
-	    }
-	    .video-grid {
-	      display: grid;
-	      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-	      gap: 12px;
-	      margin-top: 12px;
-	    }
-	    .video-item {
-	      display: grid;
-	      gap: 8px;
-	    }
-	    .video-item video {
-	      width: 100%;
-	      aspect-ratio: 16 / 9;
-	      background: #111827;
-	      border: 1px solid var(--line);
-	      border-radius: 6px;
-	    }
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .video-item {
+      display: grid;
+      gap: 8px;
+    }
+    .video-item video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #111827;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
     .timeline {
       display: grid;
       gap: 14px;
@@ -294,7 +294,7 @@ function renderReportHtml(session: ManualSessionRecord): string {
       place-items: center;
       color: var(--muted);
     }
-	    pre {
+    pre {
       overflow: auto;
       max-height: 320px;
       padding: 12px;
@@ -302,10 +302,10 @@ function renderReportHtml(session: ManualSessionRecord): string {
       color: #f9fafb;
       border-radius: 6px;
       font-size: 12px;
-	    }
-	    .layout {
-	      margin-top: 12px;
-	    }
+    }
+    .layout {
+      margin-top: 12px;
+    }
     @media (max-width: 820px) {
       .step { grid-template-columns: 1fr; }
       dl div { grid-template-columns: 1fr; }
@@ -331,17 +331,17 @@ function renderReportHtml(session: ManualSessionRecord): string {
       <h2>Artifacts</h2>
       <div class="artifacts">
         <ul class="artifact-list">
-	          <li>${renderArtifactLink('Session JSON', 'manual-session.json')}</li>
-	          <li>${renderArtifactLink('Logs JSON', session.artifacts.logsFile)}</li>
-	          <li>${renderArtifactLink('Trace ZIP', session.artifacts.trace)}</li>
-	          <li>${renderArtifactLink('Latest Screenshot', session.artifacts.latestScreenshot)}</li>
-	          <li>${renderArtifactLink('Primary Video', session.artifacts.primaryVideo)}</li>
-	          <li>${renderArtifactLink('Report ZIP', session.artifacts.zipBundle)}</li>
-	        </ul>
-	        <pre class="layout">${escapeHtml(renderFileLayout(session))}</pre>
-	        ${videos ? `<h2>Video Recordings</h2><div class="video-grid">${videos}</div>` : ''}
-	      </div>
-	    </section>
+          <li>${renderArtifactLink('Session JSON', 'manual-session.json')}</li>
+          <li>${renderArtifactLink('Logs JSON', session.artifacts.logsFile)}</li>
+          <li>${renderArtifactLink('Trace ZIP', session.artifacts.trace)}</li>
+          <li>${renderArtifactLink('Latest Screenshot', session.artifacts.latestScreenshot)}</li>
+          <li>${renderArtifactLink('Primary Video', session.artifacts.primaryVideo)}</li>
+          <li>${renderArtifactLink('Report ZIP', session.artifacts.zipBundle)}</li>
+        </ul>
+        <pre class="layout">${escapeHtml(renderFileLayout(session))}</pre>
+        ${videos ? `<h2>Video Recordings</h2><div class="video-grid">${videos}</div>` : ''}
+      </div>
+    </section>
 
     <section>
       <h2>Timeline</h2>

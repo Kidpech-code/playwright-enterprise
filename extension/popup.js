@@ -170,6 +170,7 @@ function connect() {
 
   state.socket.addEventListener('close', () => {
     state.connected = false;
+    state.manualStarted = false;
     setControllerState('idle', 'Agent disconnected');
     updateButtons();
   });
